@@ -1,0 +1,75 @@
+USING PyVISA:
+
+Run "pip install pyvisa-py"
+
+pyvisa's docs: 
+    https://pyvisa.readthedocs.io/en/latest/
+
+SCPI Commands for Agilent and Keysight 33210A Wave Generators:
+    https://www.manualslib.com/manual/529349/Agilent-Technologies-33120a.html?page=130#manual
+    
+    SCPI = Standard Commands for Programmable Instruments
+
+Basic Usage:
+    First, you need to install the NI instrument drive, which sends the commands from the script to the instrument. 
+	- https://www.ni.com/en-us/support/downloads/drivers/download.ni-visa.html#409839
+	- just install it and it will run in the background, no need to run it directly
+
+    Connect to instrument using this script:
+        -This initialization code is nestled into the FnCont.Connect() function (see below)
+
+
+
+        import pyvisa
+        rm = pyvisa.ResourceManager() # ResourceManager grabs all available instruments (remembers all previous instruments as well)
+        resources = rm.list_resources() # Lists all instruments
+
+        inst = rm.open_resource(resources[1]) # opens instrument and names it as "inst", you will need to change the number to select the instrument you want
+        print("Connected to: " + inst.query("*IDN?")) # "*IDN?" asks the instrument for its identification. I used this as a connection confirmation
+
+        inst.timeout = timeOut # Sets the timeout time. I think I read setting to 0 results in no timeout. (I had some errors related to this at the begining)
+        
+        inst.write("*rst; status:preset; *cls") # *rst; status:preset;*cls" are all used to reset the system to defaults (from power on) 
+        !!! ^THIS^ CHANGES THE OUTPUT SETTING TO "LOAD" INSTEAD OF "HIGH Z"
+
+
+
+        ***There are some other commands mentioned in the documentation to send GPIB code, but this is all I have needed so far.
+
+    Control the instument using:
+        .write() # sends command to instrument
+        .read() # reads responses from instrument
+        .query() # functions as a sender and receiver
+
+        query is used when you ask a question and want tor ead the response immediately
+        it is an alternative to sending a write, then a read
+
+        Example:
+            inst.write("VOLT 5")
+            
+            inst.query("VOLT?")
+                    -or-        
+            inst.write("VOLT 5; VOLT?") #default separator to pass multiple commands is a semicolon. This can be changed somehow, but i'll stick to the semicolon
+            inst.read()
+
+            Both return: 5
+            
+Github link to my programs:
+    https://github.com/jpware2/Fn_generator
+
+    -right now there are two scripts:
+        
+        FnCont.py (soon to be renamed)
+            -this is where I will build the functions I'll be using. 
+            -These are callable if the file you are working on is in the same directory, or specified
+                - "from FnCont import Connect, Sweep, "whatever else you need"
+                    -or-
+                  "from FnConnect import *"
+                    -and call as "Connect()"
+                - "import FnCont"
+                    -and call as "FnCont.Connect()"
+
+        Variability.py  
+            -this is what I used to run the variability experiments. 
+            -a very simple use case with no complex functions.             
+

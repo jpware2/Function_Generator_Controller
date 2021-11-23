@@ -1,0 +1,17 @@
+BEFORE FIRST USAGE:
+
+Download the NI-VISA driver:
+	- https://www.ni.com/en-us/support/downloads/drivers/download.ni-visa.html#409839
+	- you don't need to open the software, just download it and it will run in the background
+
+Then:
+ - run the direct.exe file
+ - wait until you see either:
+	-|| d>>>
+	   -or-
+	-|| i>>>
+ - enter commands 
+	-send "-h" for help
+	-more commands can be found in: 
+		-https://www.manualslib.com/manual/529349/Agilent-Technologies-33120a.html?page=130#manual
+		-page 130
